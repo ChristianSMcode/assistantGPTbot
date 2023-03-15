@@ -1,0 +1,2 @@
+https://picovoice.ai/docs/api/porcupine-python/
+https://platform.openai.com/docs/libraries
