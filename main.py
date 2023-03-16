@@ -17,6 +17,18 @@ KEYWORD_PATHS   = [os.getenv('KEYWORD_PATH')]
 ACCESS_KEY      = os.getenv('ACCESS_KEY_PORCUPINE')
 MODEL_PATH      = os.getenv('MODEL_PATH')
 LANG_SPEECH     = os.getenv('LANG_SPEECH')
+OPENAI_KEY      = os.getenv('OPENAI_KEY')
+OPENAI_ORGANIZATION = os.getenv('OPENAI_ORGANIZATION')
+LANGE_SPEECH_RECOGNITION = os.getenv('LANGE_SPEECH_RECOGNITION')
+ENGINE          = os.getenv('ENGINE')
+TEMPERATURE     = os.getenv('TEMPERATURE')
+MAX_TOKENS      = os.getenv('MAX_TOKENS')
+TOP_P           = os.getenv('TOP_P')
+FRECUENCY_PENALTY = os.getenv('FRECUENCY_PENALTY')
+PRESENCE_PENALTY  = os.getenv('PRESENCE_PENALTY')
+
+openai.api_key = OPENAI_KEY
+openai.organization = OPENAI_ORGANIZATION
 
 with open(f'langs-configuration/{LANG_SPEECH.lower()}.json','r') as lang_config:
     data = json.load(lang_config)
@@ -44,15 +56,24 @@ def generate_audio_data_from_text(text):
 def detect_words(r):
     with sr.Microphone() as source:
         try:
-            r.adjust_for_ambient_noise(source)
             audio = r.listen(source)
-            text = r.recognize_google(audio)
+            text = r.recognize_google(audio,language=LANGE_SPEECH_RECOGNITION)
             return text
         except Exception as e:
             return False
     
-def call_gpt(input):
-    pass
+def call_gpt(inp,symbol=None,en=ENGINE,temp=TEMPERATURE,max_tokens=MAX_TOKENS,top_p=TOP_P,fp=FRECUENCY_PENALTY,pp=PRESENCE_PENALTY):
+    print('inp:', inp)
+    response = openai.Completion.create(
+        engine=en,
+        prompt=inp + symbol,
+        temperature=float(temp),
+        max_tokens=int(max_tokens),
+        top_p=int(top_p),
+        frequency_penalty=int(fp),
+        presence_penalty=int(pp)
+    )
+    return response
 
         
 def main():
@@ -68,14 +89,15 @@ def main():
     while True:
         keyword_index = detect_hotword(stream,porcupine)
         if keyword_index >= 0:
-            play(generate_audio_data_from_text('Hola en que puedo ayudarte'))
+            play(generate_audio_data_from_text(data['helloPhrase']))
             while True:
+                print('detecting conversation...')
                 text = detect_words(r)
                 if not text:
                     print('Nothing was detected')
                     break
-                response = call_gpt(text)
-                play(generate_audio_data_from_text(response))
+                response = call_gpt(text,'?')
+                play(generate_audio_data_from_text(response['choices'][0]['text']))
                 
 
 

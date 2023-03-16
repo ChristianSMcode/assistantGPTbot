@@ -1,0 +1,3 @@
+Intervenir sin activarlo (APORTANDO Y/O CORRIGIENDO)
+Seleccionar modos (modal,stricto,etc)
+crear señal de detencion
