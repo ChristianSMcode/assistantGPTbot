@@ -8,6 +8,7 @@ import pyaudio
 import struct
 from dotenv import load_dotenv
 import openai
+import json
 import os
 
 load_dotenv()
@@ -16,6 +17,9 @@ KEYWORD_PATHS   = [os.getenv('KEYWORD_PATH')]
 ACCESS_KEY      = os.getenv('ACCESS_KEY_PORCUPINE')
 MODEL_PATH      = os.getenv('MODEL_PATH')
 LANG_SPEECH     = os.getenv('LANG_SPEECH')
+
+with open(f'langs-configuration/{LANG_SPEECH.lower()}.json','r') as lang_config:
+    data = json.load(lang_config)
 
 def instanciate_classes():
     porcupine = pvporcupine.create(keyword_paths=KEYWORD_PATHS, access_key=ACCESS_KEY, model_path=MODEL_PATH)
